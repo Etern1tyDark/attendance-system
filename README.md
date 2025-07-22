@@ -141,61 +141,61 @@ flowchart TD
 ## 🗄️ Database Schema
 
 ```mermaid
-erDiagram
-    USER {
-        string id PK
-        string name
-        string email UK
-        string password
-        string role
-        string studentId
-        string teacherId
-        string fingerprintData
-        string faceData
-        datetime createdAt
-        datetime updatedAt
+classDiagram
+    class USER {
+        +String id
+        +String name
+        +String email
+        +String password
+        +String role
+        +String studentId
+        +String teacherId
+        +String fingerprintData
+        +String faceData
+        +Date createdAt
+        +Date updatedAt
     }
     
-    CLASS {
-        string id PK
-        string className
-        string teacherId FK
-        date date
-        datetime startTime
-        datetime endTime
-        string material
-        string status
-        boolean teacherAttended
-        int studentCount
-        int attendedStudentCount
-        datetime createdAt
+    class CLASS {
+        +String id
+        +String className
+        +String teacherId
+        +Date date
+        +Date startTime
+        +Date endTime
+        +String material
+        +String status
+        +Boolean teacherAttended
+        +Number studentCount
+        +Number attendedStudentCount
+        +Date createdAt
     }
     
-    ATTENDANCE {
-        string id PK
-        string userId FK
-        string classId FK
-        string status
-        boolean fingerprintVerified
-        boolean faceVerified
-        datetime timestamp
+    class ATTENDANCE {
+        +String id
+        +String userId
+        +String classId
+        +String status
+        +Boolean fingerprintVerified
+        +Boolean faceVerified
+        +Date timestamp
     }
     
-    FEEDBACK {
-        string id PK
-        string studentId FK
-        string classId FK
-        int rating
-        string comment
-        datetime createdAt
-        datetime updatedAt
+    class FEEDBACK {
+        +String id
+        +String studentId
+        +String classId
+        +Number rating
+        +String comment
+        +Date createdAt
+        +Date updatedAt
     }
     
-    USER ||--o{ CLASS : "teaches"
-    USER ||--o{ ATTENDANCE : "attends"
-    USER ||--o{ FEEDBACK : "provides"
-    CLASS ||--o{ ATTENDANCE : "has"
-    CLASS ||--o{ FEEDBACK : "receives"
+    USER ||--o{ CLASS : teaches
+    USER ||--o{ ATTENDANCE : attends
+    USER ||--o{ FEEDBACK : provides
+    CLASS ||--o{ ATTENDANCE : has
+    CLASS ||--o{ FEEDBACK : receives
 ```
 
 ## 🚀 Quick Start
