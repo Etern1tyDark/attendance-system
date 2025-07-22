@@ -143,52 +143,52 @@ flowchart TD
 ```mermaid
 erDiagram
     USER {
-        ObjectId _id PK
-        String name
-        String email UK
-        String password
-        String role
-        String studentId
-        String teacherId
-        String fingerprintData
-        String faceData
-        Date createdAt
-        Date updatedAt
+        string id PK
+        string name
+        string email UK
+        string password
+        string role
+        string studentId
+        string teacherId
+        string fingerprintData
+        string faceData
+        datetime createdAt
+        datetime updatedAt
     }
     
     CLASS {
-        ObjectId _id PK
-        String className
-        ObjectId teacherId FK
-        Date date
-        Date startTime
-        Date endTime
-        String material
-        String status
-        Boolean teacherAttended
-        Number studentCount
-        Number attendedStudentCount
-        Date createdAt
+        string id PK
+        string className
+        string teacherId FK
+        date date
+        datetime startTime
+        datetime endTime
+        string material
+        string status
+        boolean teacherAttended
+        int studentCount
+        int attendedStudentCount
+        datetime createdAt
     }
     
     ATTENDANCE {
-        ObjectId _id PK
-        ObjectId userId FK
-        ObjectId classId FK
-        String status
-        Boolean fingerprintVerified
-        Boolean faceVerified
-        Date timestamp
+        string id PK
+        string userId FK
+        string classId FK
+        string status
+        boolean fingerprintVerified
+        boolean faceVerified
+        datetime timestamp
     }
     
     FEEDBACK {
-        ObjectId _id PK
-        ObjectId studentId FK
-        ObjectId classId FK
-        Number rating
-        String comment
-        Date createdAt
-        Date updatedAt
+        string id PK
+        string studentId FK
+        string classId FK
+        int rating
+        string comment
+        datetime createdAt
+        datetime updatedAt
     }
     
     USER ||--o{ CLASS : "teaches"
