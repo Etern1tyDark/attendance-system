@@ -191,11 +191,11 @@ classDiagram
         +Date updatedAt
     }
     
-    USER ||--o{ CLASS : teaches
-    USER ||--o{ ATTENDANCE : attends
-    USER ||--o{ FEEDBACK : provides
-    CLASS ||--o{ ATTENDANCE : has
-    CLASS ||--o{ FEEDBACK : receives
+    USER --> CLASS : teaches
+    USER --> ATTENDANCE : attends
+    USER --> FEEDBACK : provides
+    CLASS --> ATTENDANCE : has_attendance
+    CLASS --> FEEDBACK : receives_feedback
 ```
 
 ## 🚀 Quick Start
