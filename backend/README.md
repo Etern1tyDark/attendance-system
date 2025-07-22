@@ -1,8 +1,4 @@
-# pweb-express-mongodb-P05-2024
-
-## Initial Setup
-
-**NOTE: # Smart Attendance System Backend
+# Smart Attendance System Backend
 
 A comprehensive backend API for a smart attendance system that uses biometric authentication (fingerprint and face recognition) to mark attendance.
 
@@ -87,7 +83,7 @@ A comprehensive backend API for a smart attendance system that uses biometric au
 
 1. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Create `.env` file:
@@ -99,13 +95,13 @@ A comprehensive backend API for a smart attendance system that uses biometric au
 
 3. Run development server:
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
-4. Build for production:
+4. **Build for Production**:
    ```bash
-   npm run build
-   npm start
+   pnpm build
+   pnpm start
    ```
 
 ## Authentication Flow
@@ -128,98 +124,4 @@ A comprehensive backend API for a smart attendance system that uses biometric au
 - JWT token authentication
 - Role-based access control
 - Biometric verification (basic implementation)
-- Input validation and sanitization**
-
-Install dependencies with:
-
-```
-yarn install
-```
-
-Run dev server with:
-
-```
-yarn run dev
-```
-
-**Setting .env**
-
-Create an .env file based on `.env.example`.
-
-```
-MONGODB_URI="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority"
-JWT_SECRET=""
-```
-
-- MONGODB_URI can be obtained by going into MongoDB Atlas > Connect > Drivers (Use v5.5 stable API)
-
-- JWT_SECRET can be anything, like `qwertyuiopasdfghjklzxcvbnm`
-
-## Development Flow
-
-Create model (schema) > service > controller > router
-
-## API Endpoints
-
-### Authentication
-
-- **User register**
-
-`POST {{BASE_URL}}/auth/register`
-
-Params
-
-```
-username: string;
-email: string;
-password: string;
-```
-
-- **User login**
-
-`POST {{BASE_URL}}/auth/login`
-
-Params
-
-```
-email: string;
-password: string;
-```
-
-### Books (WIP)
-
-- Get All Books
-
-`GET {{BASE_URL}}/book`
-
-- Get Book by ID
-
-`GET {{BASE_URL}}/book/:id`
-
-- Add New Book
-
-`POST {{BASE_URL}}/book`
-
-- Modify Book Data
-
-`PATCH {{BASE_URL}}/book/:id`
-
-- Remove Book
-
-`DELETE {{BASE_URL}}/book/:id`
-
-### Mechanism (WIP)
-
-- Borrow a Book
-
-`POST {{BASE_URL}}/mechanism/borrow/:id`
-
-- Return a Book
-
-`POST {{BASE_URL}}/mechanism/return/:id`
-
-### Misc
-
-Health Check
-
-`GET {{BASE_URL}}/`
+- Input validation and sanitization

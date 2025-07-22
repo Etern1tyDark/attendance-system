@@ -145,7 +145,6 @@ The frontend integrates with the backend REST API:
 
 - Real biometric integration with hardware
 - Progressive Web App (PWA) features
-- Offline support for attendance marking
 - Advanced analytics and reporting
 - Real-time notifications
 - Multi-language support
