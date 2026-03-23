@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getToken, logout } from './auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://attendance-system-backend-1ddj.onrender.com';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
