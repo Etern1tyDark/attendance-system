@@ -5,6 +5,7 @@
   "author": "Smart Attendance System",
   "license": "MIT",
   "description": "Backend API for Smart Attendance System with biometric authentication",
+  "packageManager": "pnpm@10.4.1",
   "engines": {
     "node": ">=20"
   },
