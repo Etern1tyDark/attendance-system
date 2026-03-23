@@ -11,18 +11,20 @@ import env from "@/config/env";
 
 const app: Express = express();
 const port = env.port;
+const allowedOrigins = new Set(env.clientOrigins);
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin === env.clientUrl) {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true);
         return;
       }
 
-      callback(new Error("Not allowed by CORS"));
+      console.warn(`[cors] Blocked origin: ${origin}`);
+      callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -61,4 +63,5 @@ app.use('/feedback', feedbackRoutes);
 
 app.listen(port, () => {
   console.log(`[server]: Smart Attendance System API running at http://localhost:${port}`);
+  console.log(`[server]: Allowed client origins: ${env.clientOrigins.join(", ") || "(none configured)"}`);
 });

@@ -119,7 +119,7 @@ This repo includes a Render blueprint at `../render.yaml` for the backend servic
 5. Set these environment variables in Render before the first deploy:
    - `MONGODB_URI`
    - `JWT_SECRET`
-   - `CLIENT_URL`
+   - `CLIENT_URL` or `CLIENT_URLS`
    - `ADMIN_EMAIL`
    - `ADMIN_PASSWORD`
 
@@ -137,6 +137,12 @@ If you prefer not to use the blueprint, create a **Web Service** in Render with:
 - `JWT_EXPIRES_IN=1h`
 - `BCRYPT_SALT_ROUNDS=10`
 - `CLIENT_URL=<your deployed frontend URL>`
+- `CLIENT_URLS=<comma-separated frontend URLs>` if you need more than one allowed origin
+
+### CORS note for GitHub Pages
+- The backend compares the browser `Origin` header, not the API URL.
+- For this project's Pages deploy, the production origin is `https://etern1tydark.github.io`.
+- If you still want local development access from `http://localhost:3000`, set `CLIENT_URLS=http://localhost:3000,https://etern1tydark.github.io`.
 
 ### After deployment
 - Use the Render service URL as the frontend's `NEXT_PUBLIC_API_URL`.
