@@ -114,7 +114,7 @@ This repo includes a Render blueprint at `../render.yaml` for the backend servic
 3. Select this repository.
 4. Render will detect `render.yaml` and create the backend service using:
    - `rootDir`: `backend`
-   - `buildCommand`: `corepack enable && pnpm install --frozen-lockfile && pnpm build`
+   - `buildCommand`: `npm install -g pnpm@10.4.1 && pnpm install --frozen-lockfile && pnpm build`
    - `startCommand`: `pnpm start`
 5. Set these environment variables in Render before the first deploy:
    - `MONGODB_URI`
@@ -128,7 +128,7 @@ If you prefer not to use the blueprint, create a **Web Service** in Render with:
 
 - Root Directory: `backend`
 - Runtime: `Node`
-- Build Command: `corepack enable && pnpm install --frozen-lockfile && pnpm build`
+- Build Command: `npm install -g pnpm@10.4.1 && pnpm install --frozen-lockfile && pnpm build`
 - Start Command: `pnpm start`
 - Health Check Path: `/`
 
