@@ -13,6 +13,22 @@ export interface User {
   faceData?: string;
 }
 
+export interface TeacherSummary {
+  _id: string;
+  name: string;
+  email: string;
+  teacherId?: string;
+}
+
+export interface ClassSummary {
+  _id: string;
+  className: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  material?: string;
+}
+
 export interface LoginData {
   email: string;
   password: string;
@@ -28,7 +44,7 @@ export interface RegisterData {
 export interface Class {
   _id: string;
   className: string;
-  teacherId: string | { _id: string; name: string; email: string };
+  teacherId: string | TeacherSummary;
   date: string;
   startTime: string;
   endTime: string;
@@ -41,8 +57,8 @@ export interface Class {
 
 export interface Attendance {
   _id: string;
-  userId: string;
-  classId: string;
+  userId: string | User;
+  classId: string | ClassSummary;
   status: 'PRESENT' | 'ABSENT';
   fingerprintVerified: boolean;
   faceVerified: boolean;
@@ -51,42 +67,40 @@ export interface Attendance {
 
 export interface Feedback {
   _id: string;
-  studentId: string;
-  classId: string;
+  studentId: string | User;
+  classId: string | ClassSummary;
   rating: number;
   comment: string;
   createdAt: string;
   updatedAt: string;
 }
 
-// Auth API
 export const authApi = {
   login: (data: LoginData) => api.post('/user/login', data),
   register: (data: RegisterData) => api.post('/user/register', data),
   getProfile: () => api.get('/user/profile'),
-  updateBiometric: (data: { fingerprintData?: string; faceData?: string }) => 
+  updateBiometric: (data: { fingerprintData?: string; faceData?: string }) =>
     api.put('/user/biometric', data),
 };
 
-// User API
 export const userApi = {
   getUsers: () => api.get('/user/list'),
   deleteUser: (userId: string) => api.delete(`/user/${userId}`),
+  exportAllData: (format: 'csv' | 'xlsx') =>
+    api.get('/user/export', { params: { format }, responseType: 'blob' }),
 };
 
-// Attendance API
 export const attendanceApi = {
-  markAttendance: (data: { 
-    classId: string; 
-    fingerprintData?: string; 
-    faceData?: string; 
+  markAttendance: (data: {
+    classId: string;
+    fingerprintData?: string;
+    faceData?: string;
   }) => api.post('/attendance/mark', data),
   getAttendanceByClass: (classId: string) => api.get(`/attendance/class/${classId}`),
   getAttendanceByUser: () => api.get('/attendance/user'),
   getAttendanceStats: (classId: string) => api.get(`/attendance/stats/${classId}`),
 };
 
-// Class API
 export const classApi = {
   createClass: (data: {
     className: string;
@@ -95,17 +109,16 @@ export const classApi = {
     endTime: string;
     material?: string;
   }) => api.post('/class', data),
-  getClasses: (params?: { teacherId?: string; date?: string }) => 
+  getClasses: (params?: { teacherId?: string; date?: string }) =>
     api.get('/class', { params }),
   getAllClassesWithStatus: () => api.get('/class/all'),
   getClassById: (classId: string) => api.get(`/class/${classId}`),
-  updateClassMaterial: (classId: string, material: string) => 
+  updateClassMaterial: (classId: string, material: string) =>
     api.put(`/class/${classId}/material`, { material }),
   getClassStats: () => api.get('/class/stats'),
   deleteClass: (classId: string) => api.delete(`/class/${classId}`),
 };
 
-// Feedback API
 export const feedbackApi = {
   submitFeedback: (data: {
     classId: string;

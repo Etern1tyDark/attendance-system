@@ -7,12 +7,33 @@ import attendanceRoutes from "@/router/attendance.router";
 import classRoutes from "@/router/class.router";
 import feedbackRoutes from "@/router/feedback.router";
 import formatResponse from "@/utils/formatResponse";
+import env from "@/config/env";
 
 const app: Express = express();
-const port = process.env.PORT || 3001;
+const port = env.port;
 
-app.use(express.json());
-app.use(cors());
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || origin === env.clientUrl) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("X-Frame-Options", "DENY");
+  next();
+});
 
 // mongodb atlas connection
 connDB();

@@ -2,6 +2,8 @@ import UserService from "@/services/user.service";
 import { Request, Response } from "express";
 import { CustomRequest } from "@/middleware/auth";
 import formatResponse from "@/utils/formatResponse";
+import getErrorStatusCode from "@/utils/getErrorStatusCode";
+import ExportService from "@/services/export.service";
 
 class UserController {
   async register(req: Request, res: Response) {
@@ -20,12 +22,8 @@ class UserController {
     } 
     catch (error) {
       if (error instanceof Error) {
-        if (error.message.includes("Email already exists...")) {
-          res.status(409).json(formatResponse("failed", error.message, null));
-        }
-        else {
-          res.status(500).json(formatResponse("error", error.message, null));
-        }
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } 
       else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
@@ -42,11 +40,14 @@ class UserController {
 
       const { user, token } = await UserService.login({ email, password });
       const user_ = { 
+        _id: user._id,
+        id: user._id,
         name: user.name, 
         email: user.email, 
         role: user.role, 
         studentId: user.studentId,
-        teacherId: user.teacherId 
+        teacherId: user.teacherId,
+        adminId: user.adminId,
       };
 
       res.status(200).json(formatResponse(
@@ -55,11 +56,8 @@ class UserController {
     }
     catch (error) {
       if (error instanceof Error) {
-        if (error.message.includes("User not found...") || error.message.includes("Wrong password!")) {
-          res.status(401).json(formatResponse("failed", error.message, null));
-        } else {
-          res.status(500).json(formatResponse("error", error.message, null));
-        }
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -85,7 +83,8 @@ class UserController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -105,7 +104,8 @@ class UserController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -124,7 +124,8 @@ class UserController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -149,7 +150,50 @@ class UserController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
+      } else {
+        res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
+      }
+    }
+  }
+
+  async exportAllDataCsv(req: CustomRequest, res: Response) {
+    try {
+      if (!req.user || !["ADMIN", "TEACHER"].includes(req.user.role)) {
+        throw new Error("Access denied. Only admins and teachers can export system data.");
+      }
+
+      const format = req.query.format === "xlsx" ? "xlsx" : "csv";
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const filePrefix =
+        req.user.role === "ADMIN" ? "smart-attendance-export" : "teacher-attendance-export";
+
+      if (format === "xlsx") {
+        const workbook = await ExportService.exportAllDataXlsx(req.user);
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${filePrefix}-${timestamp}.xlsx"`
+        );
+        res.status(200).send(workbook);
+        return;
+      }
+
+      const csv = await ExportService.exportAllDataCsv(req.user);
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${filePrefix}-${timestamp}.csv"`
+      );
+      res.status(200).send(csv);
+    } catch (error) {
+      if (error instanceof Error) {
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }

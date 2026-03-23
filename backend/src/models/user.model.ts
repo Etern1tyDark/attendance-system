@@ -8,6 +8,7 @@ export interface User_ extends Document {
   role: UserRole;
   studentId?: string; // For students
   teacherId?: string; // For teachers
+  adminId?: string; // For admins
   fingerprintData?: string; // Fingerprint template data
   faceData?: string; // Face recognition data
   createdAt: Date;
@@ -21,6 +22,7 @@ const UserSchema: Schema = new Schema({
   role: { type: String, required: true, enum: Object.values(UserRole) },
   studentId: { type: String, sparse: true, unique: true },
   teacherId: { type: String, sparse: true, unique: true },
+  adminId: { type: String, sparse: true, unique: true },
   fingerprintData: { type: String },
   faceData: { type: String },
 }, {

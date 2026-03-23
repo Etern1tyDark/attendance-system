@@ -1,12 +1,24 @@
 import type { User_ } from "@/models/user.model";
 import User from "@/models/user.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 import { UserRole } from "@/models/enums";
+import env from "@/config/env";
 
 export class UserService {
   async register(userData: User_): Promise<User_> {
-    if (await User.findOne({ email: userData.email })) {
+    const normalizedEmail = userData.email?.trim().toLowerCase();
+    const normalizedName = userData.name?.trim();
+
+    if (!normalizedEmail || !normalizedName || !userData.password?.trim()) {
+      throw new Error("Name, email, and password are required");
+    }
+
+    if (![UserRole.STUDENT, UserRole.TEACHER].includes(userData.role)) {
+      throw new Error("Invalid role selected");
+    }
+
+    if (await User.findOne({ email: normalizedEmail })) {
       throw new Error("Email already exists...");
     }
 
@@ -20,12 +32,14 @@ export class UserService {
       additionalData.teacherId = `TCH${String(teacherCount + 1).padStart(6, '0')}`;
     }
 
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const hashedPassword = await bcrypt.hash(userData.password, env.bcryptSaltRounds);
     const user = new User({ 
       ...userData, 
       ...additionalData,
+      name: normalizedName,
+      email: normalizedEmail,
       password: hashedPassword, 
-      role: userData.role || UserRole.STUDENT 
+      role: userData.role
     });
     return await user.save();
   }
@@ -34,7 +48,12 @@ export class UserService {
     email: string;
     password: string;
   }): Promise<{ user: User_; token: string }> {
-    const user = await User.findOne({ email: userData.email });
+    const normalizedEmail = userData.email?.trim().toLowerCase();
+    if (!normalizedEmail || !userData.password?.trim()) {
+      throw new Error("Email and password are required");
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       throw new Error("User not found...");
@@ -46,8 +65,8 @@ export class UserService {
 
     const token = jwt.sign(
       { username: user.name, id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      env.jwtSecret,
+      { expiresIn: env.jwtExpiresIn as SignOptions["expiresIn"] }
     );
 
     return { user, token };

@@ -21,6 +21,13 @@ export class AttendanceService {
       throw new Error("Class not found");
     }
 
+    if (
+      user.role === "TEACHER" &&
+      classData.teacherId.toString() !== attendanceData.userId
+    ) {
+      throw new Error("You can only mark attendance for your own class");
+    }
+
     // Check if attendance already exists
     const existingAttendance = await Attendance.findOne({
       userId: attendanceData.userId,
@@ -70,6 +77,10 @@ export class AttendanceService {
         status: ClassStatus.SUCCESS
       });
     } else if (user.role === 'STUDENT') {
+      if (new Date(classData.endTime) < new Date()) {
+        throw new Error("Attendance can no longer be marked for a class that has ended");
+      }
+
       await Class.findByIdAndUpdate(attendanceData.classId, {
         $inc: { attendedStudentCount: 1 }
       });

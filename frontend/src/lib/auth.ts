@@ -1,21 +1,32 @@
-import Cookies from 'js-cookie';
 import { User } from './types';
 
+const TOKEN_STORAGE_KEY = 'smart-attendance-token';
+const USER_STORAGE_KEY = 'smart-attendance-user';
+
+const getStorage = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.sessionStorage;
+};
+
 export const getToken = () => {
-  return Cookies.get('token');
+  return getStorage()?.getItem(TOKEN_STORAGE_KEY) || null;
 };
 
 export const setToken = (token: string) => {
-  Cookies.set('token', token, { expires: 1 }); // 1 day
+  getStorage()?.setItem(TOKEN_STORAGE_KEY, token);
 };
 
 export const removeToken = () => {
-  Cookies.remove('token');
+  getStorage()?.removeItem(TOKEN_STORAGE_KEY);
 };
 
 export const getUser = (): User | null => {
-  const userStr = Cookies.get('user');
+  const userStr = getStorage()?.getItem(USER_STORAGE_KEY);
   if (!userStr) return null;
+
   try {
     return JSON.parse(userStr);
   } catch {
@@ -24,11 +35,11 @@ export const getUser = (): User | null => {
 };
 
 export const setUser = (user: User) => {
-  Cookies.set('user', JSON.stringify(user), { expires: 1 });
+  getStorage()?.setItem(USER_STORAGE_KEY, JSON.stringify(user));
 };
 
 export const removeUser = () => {
-  Cookies.remove('user');
+  getStorage()?.removeItem(USER_STORAGE_KEY);
 };
 
 export const isAuthenticated = () => {
@@ -55,5 +66,8 @@ export const isStudent = () => {
 export const logout = () => {
   removeToken();
   removeUser();
-  window.location.href = '/login';
+
+  if (typeof window !== 'undefined') {
+    window.location.href = '/';
+  }
 };

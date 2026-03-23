@@ -1,7 +1,8 @@
 import FeedbackService from "@/services/feedback.service";
 import formatResponse from "@/utils/formatResponse";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { CustomRequest } from "@/middleware/auth";
+import getErrorStatusCode from "@/utils/getErrorStatusCode";
 
 class FeedbackController {
   async submitFeedback(req: CustomRequest, res: Response) {
@@ -29,15 +30,20 @@ class FeedbackController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
     }
   }
 
-  async getFeedbackByClass(req: Request, res: Response) {
+  async getFeedbackByClass(req: CustomRequest, res: Response) {
     try {
+      if (!req.user || (req.user.role !== "TEACHER" && req.user.role !== "ADMIN")) {
+        throw new Error("Access denied. Only teachers and admins can view class feedback.");
+      }
+
       const { classId } = req.params;
       const feedback = await FeedbackService.getFeedbackByClass(classId);
 
@@ -46,7 +52,8 @@ class FeedbackController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -67,7 +74,8 @@ class FeedbackController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -95,7 +103,8 @@ class FeedbackController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }

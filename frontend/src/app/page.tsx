@@ -1,112 +1,206 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated, getUserRole } from '@/lib/auth';
-import { Fingerprint, Users, BookOpen, MessageSquare, BarChart3 } from 'lucide-react';
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  CheckCircle2,
+  Download,
+  Fingerprint,
+  LogOut,
+  MessageSquare,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
+import { getUserRole, isAuthenticated, logout } from '@/lib/auth';
+
+type Role = 'ADMIN' | 'TEACHER' | 'STUDENT' | undefined;
 
 export default function Home() {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [role, setRole] = useState<Role>(undefined);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
+    setAuthenticated(isAuthenticated());
+    setRole(getUserRole());
+    setReady(true);
+  }, []);
 
-    const role = getUserRole();
-    if (role === 'ADMIN') {
-      router.push('/admin/dashboard');
-    } else if (role === 'TEACHER') {
-      router.push('/teacher/dashboard');
-    } else if (role === 'STUDENT') {
-      router.push('/student/dashboard');
-    }
-  }, [router]);
+  const dashboardPath = useMemo(() => {
+    if (role === 'ADMIN') return '/admin/dashboard';
+    if (role === 'TEACHER') return '/teacher/dashboard';
+    if (role === 'STUDENT') return '/student/dashboard';
+    return '/login';
+  }, [role]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <div className="p-3 bg-blue-600 rounded-full">
-              <Fingerprint className="w-8 h-8 text-white" />
+    <div className="landing-page min-h-screen p-4 sm:p-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        <header className="landing-nav">
+          <div className="flex items-center gap-4">
+            <div className="landing-brand-icon">
+              <Fingerprint className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="landing-brand-title">Smart Attendance System</h1>
+              <p className="landing-brand-subtitle">
+                Role-based attendance, class management, feedback, and CSV exports
+              </p>
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Smart Attendance System
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            A comprehensive attendance management system with biometric authentication 
-            for schools and educational institutions.
-          </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="p-3 bg-blue-100 rounded-full w-fit mx-auto mb-4">
-              <Fingerprint className="w-6 h-6 text-blue-600" />
+          {ready && (
+            <div className="flex flex-wrap items-center gap-3">
+              {authenticated ? (
+                <>
+                  <button
+                    onClick={() => router.push(dashboardPath)}
+                    className="landing-primary-button"
+                  >
+                    Dashboard
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="landing-secondary-button"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => router.push('/login')}
+                    className="landing-primary-button"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => router.push('/register')}
+                    className="landing-secondary-button"
+                  >
+                    Register
+                  </button>
+                </>
+              )}
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Biometric Auth</h3>
-            <p className="text-sm text-gray-600">
-              Secure fingerprint and face recognition for attendance marking
+          )}
+        </header>
+
+        <section className="landing-hero">
+          <div className="landing-hero-copy">
+            <div className="landing-kicker">Platform overview</div>
+            <h2 className="landing-hero-title">
+              Attendance workflows built for schools.
+            </h2>
+            <p className="landing-hero-description">
+              This system already supports separate admin, teacher, and student dashboards,
+              class creation and material updates, attendance marking, post-class feedback,
+              and teacher and admin CSV exports.
             </p>
-          </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="p-3 bg-green-100 rounded-full w-fit mx-auto mb-4">
-              <Users className="w-6 h-6 text-green-600" />
+            <div className="landing-hero-actions">
+              <button
+                onClick={() => router.push(authenticated ? dashboardPath : '/login')}
+                className="landing-primary-button"
+              >
+                {authenticated ? 'Open Dashboard' : 'Open Login'}
+              </button>
+              <button
+                onClick={() => router.push('/register')}
+                className="landing-secondary-button"
+              >
+                Create Account
+              </button>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Role Management</h3>
-            <p className="text-sm text-gray-600">
-              Separate dashboards for admins, teachers, and students
-            </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="p-3 bg-purple-100 rounded-full w-fit mx-auto mb-4">
-              <BookOpen className="w-6 h-6 text-purple-600" />
+          <div className="landing-highlight-card">
+            <div className="landing-highlight-row">
+              <ShieldCheck className="h-5 w-5 text-blue-400" />
+              <span>JWT-protected role-based access</span>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Class Management</h3>
-            <p className="text-sm text-gray-600">
-              Create and manage classes with materials and schedules
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="p-3 bg-orange-100 rounded-full w-fit mx-auto mb-4">
-              <BarChart3 className="w-6 h-6 text-orange-600" />
+            <div className="landing-highlight-row">
+              <Fingerprint className="h-5 w-5 text-cyan-400" />
+              <span>Attendance marking with biometric flow support</span>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Analytics</h3>
-            <p className="text-sm text-gray-600">
-              Track attendance rates and class success statistics
-            </p>
+            <div className="landing-highlight-row">
+              <MessageSquare className="h-5 w-5 text-violet-400" />
+              <span>Student feedback collection after class completion</span>
+            </div>
+            <div className="landing-highlight-row">
+              <Download className="h-5 w-5 text-emerald-400" />
+              <span>CSV export for admins and teachers</span>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Welcome to Smart Attendance
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Please log in to access your dashboard and start managing attendance.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => router.push('/login')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => router.push('/register')}
-              className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-            >
-              Register
-            </button>
+        <section className="landing-role-grid">
+          <RoleCard
+            icon={<Users className="h-6 w-6 text-blue-500" />}
+            title="Admin workspace"
+            description="Review users, inspect every class, read anonymous class feedback, and export full-system CSV data."
+          />
+          <RoleCard
+            icon={<BookOpen className="h-6 w-6 text-emerald-500" />}
+            title="Teacher workspace"
+            description="Create classes, update materials, mark teacher attendance, review student feedback, and export your records."
+          />
+          <RoleCard
+            icon={<Fingerprint className="h-6 w-6 text-cyan-500" />}
+            title="Student workspace"
+            description="Mark attendance, track attendance history, and submit feedback once a class has ended."
+          />
+        </section>
+
+        <section className="landing-panel">
+          <div className="mb-6 flex items-center gap-3">
+            <BarChart3 className="h-5 w-5 text-amber-400" />
+            <h3 className="landing-section-title">What is live in this build</h3>
           </div>
-        </div>
+
+          <div className="landing-check-grid">
+            {/* <FeatureLine text="Role-specific dashboards for admins, teachers, and students" /> */}
+            <FeatureLine text="Class creation, schedule handling, and material editing" />
+            <FeatureLine text="Attendance marking with duplicate protection and validation" />
+            <FeatureLine text="Post-class student feedback with teacher/admin review" />
+            <FeatureLine text="CSV export from admin and teacher dashboards" />
+            {/* <FeatureLine text="Dark mode toggle and persistent theme preference" /> */}
+          </div>
+        </section>
       </div>
+    </div>
+  );
+}
+
+function RoleCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <article className="landing-panel">
+      <div className="landing-card-icon">{icon}</div>
+      <h3 className="landing-card-title">{title}</h3>
+      <p className="landing-card-description">{description}</p>
+    </article>
+  );
+}
+
+function FeatureLine({ text }: { text: string }) {
+  return (
+    <div className="landing-check-line">
+      <CheckCircle2 className="h-4 w-4 mt-1 text-emerald-400" />
+      <span>{text}</span>
     </div>
   );
 }

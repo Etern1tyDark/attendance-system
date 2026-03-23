@@ -1,7 +1,8 @@
 import AttendanceService from "../services/attendance.service";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { CustomRequest } from "@/middleware/auth";
 import formatResponse from "@/utils/formatResponse";
+import getErrorStatusCode from "@/utils/getErrorStatusCode";
 
 class AttendanceController {
   async markAttendance(req: CustomRequest, res: Response) {
@@ -25,15 +26,20 @@ class AttendanceController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
     }
   }
 
-  async getAttendanceByClass(req: Request, res: Response) {
+  async getAttendanceByClass(req: CustomRequest, res: Response) {
     try {
+      if (!req.user || (req.user.role !== "TEACHER" && req.user.role !== "ADMIN")) {
+        throw new Error("Access denied. Only teachers and admins can view class attendance.");
+      }
+
       const { classId } = req.params;
       const attendance = await AttendanceService.getAttendanceByClass(classId);
 
@@ -42,7 +48,8 @@ class AttendanceController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
@@ -63,15 +70,20 @@ class AttendanceController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }
     }
   }
 
-  async getAttendanceStats(req: Request, res: Response) {
+  async getAttendanceStats(req: CustomRequest, res: Response) {
     try {
+      if (!req.user || (req.user.role !== "TEACHER" && req.user.role !== "ADMIN")) {
+        throw new Error("Access denied. Only teachers and admins can view attendance statistics.");
+      }
+
       const { classId } = req.params;
       const stats = await AttendanceService.getAttendanceStats(classId);
 
@@ -80,7 +92,8 @@ class AttendanceController {
       ));
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json(formatResponse("error", error.message, null));
+        const statusCode = getErrorStatusCode(error.message);
+        res.status(statusCode).json(formatResponse(statusCode >= 500 ? "error" : "failed", error.message, null));
       } else {
         res.status(500).json(formatResponse("error", "An unknown error occurred.", null));
       }

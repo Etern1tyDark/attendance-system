@@ -2,6 +2,7 @@ import Feedback from "@/models/feedback.model";
 import User from "@/models/user.model";
 import Class from "@/models/class.model";
 import { UserRole } from "@/models/enums";
+import Attendance from "@/models/attendance.model";
 
 export class FeedbackService {
   async submitFeedback(feedbackData: {
@@ -20,6 +21,19 @@ export class FeedbackService {
       throw new Error("Class not found");
     }
 
+    if (new Date(classData.endTime) > new Date()) {
+      throw new Error("Feedback can only be submitted after the class ends");
+    }
+
+    const attendedClass = await Attendance.findOne({
+      userId: feedbackData.studentId,
+      classId: feedbackData.classId,
+    });
+
+    if (!attendedClass) {
+      throw new Error("You can only submit feedback for classes you attended");
+    }
+
     // Check if feedback already exists
     const existingFeedback = await Feedback.findOne({
       studentId: feedbackData.studentId,
@@ -30,7 +44,10 @@ export class FeedbackService {
       throw new Error("Feedback already submitted for this class");
     }
 
-    const feedback = new Feedback(feedbackData);
+    const feedback = new Feedback({
+      ...feedbackData,
+      comment: feedbackData.comment.trim(),
+    });
     await feedback.save();
 
     return feedback.populate(['studentId', 'classId']);
@@ -78,7 +95,7 @@ export class FeedbackService {
       feedbackId,
       { 
         rating: updateData.rating,
-        comment: updateData.comment 
+        comment: updateData.comment?.trim()
       },
       { new: true }
     ).populate(['studentId', 'classId']);

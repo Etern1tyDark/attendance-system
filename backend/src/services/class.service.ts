@@ -17,10 +17,20 @@ export class ClassService {
       throw new Error("Invalid teacher");
     }
 
+    if (!classData.className?.trim()) {
+      throw new Error("Class name is required");
+    }
+
+    if (new Date(classData.endTime) <= new Date(classData.startTime)) {
+      throw new Error("End time must be later than start time");
+    }
+
     const totalStudents = await User.countDocuments({ role: UserRole.STUDENT });
 
     const newClass = new Class({
       ...classData,
+      className: classData.className.trim(),
+      material: classData.material?.trim() || "",
       studentCount: totalStudents,
       status: ClassStatus.EMPTY,
       teacherAttended: false,
@@ -43,7 +53,7 @@ export class ClassService {
 
     const updatedClass = await Class.findByIdAndUpdate(
       classId,
-      { material },
+      { material: material?.trim() || "" },
       { new: true }
     ).populate('teacherId', 'name email teacherId');
 
@@ -157,7 +167,7 @@ export class ClassService {
     return classes.map(cls => ({
       _id: cls._id,
       className: cls.className,
-      teacher: cls.teacherId,
+      teacherId: cls.teacherId,
       date: cls.date,
       startTime: cls.startTime,
       endTime: cls.endTime,

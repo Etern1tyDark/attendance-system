@@ -104,6 +104,44 @@ A comprehensive backend API for a smart attendance system that uses biometric au
    pnpm start
    ```
 
+## Deploy on Render
+
+This repo includes a Render blueprint at `../render.yaml` for the backend service.
+
+### Option 1: Blueprint deploy
+1. Push the repository to GitHub.
+2. In Render, choose **New +** -> **Blueprint**.
+3. Select this repository.
+4. Render will detect `render.yaml` and create the backend service using:
+   - `rootDir`: `backend`
+   - `buildCommand`: `corepack enable && pnpm install --frozen-lockfile && pnpm build`
+   - `startCommand`: `pnpm start`
+5. Set these environment variables in Render before the first deploy:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `CLIENT_URL`
+   - `ADMIN_EMAIL`
+   - `ADMIN_PASSWORD`
+
+### Option 2: Manual web service
+If you prefer not to use the blueprint, create a **Web Service** in Render with:
+
+- Root Directory: `backend`
+- Runtime: `Node`
+- Build Command: `corepack enable && pnpm install --frozen-lockfile && pnpm build`
+- Start Command: `pnpm start`
+- Health Check Path: `/`
+
+### Recommended production values
+- `NODE_ENV=production`
+- `JWT_EXPIRES_IN=1h`
+- `BCRYPT_SALT_ROUNDS=10`
+- `CLIENT_URL=<your deployed frontend URL>`
+
+### After deployment
+- Use the Render service URL as the frontend's `NEXT_PUBLIC_API_URL`.
+- Keep MongoDB hosted somewhere reachable from Render, such as MongoDB Atlas.
+
 ## Authentication Flow
 
 1. **Registration**: Users register with role selection (TEACHER/STUDENT)
