@@ -1,4 +1,5 @@
 import { User } from './types';
+import { withBasePath } from './base-path';
 
 const TOKEN_STORAGE_KEY = 'smart-attendance-token';
 const USER_STORAGE_KEY = 'smart-attendance-user';
@@ -68,6 +69,6 @@ export const logout = () => {
   removeUser();
 
   if (typeof window !== 'undefined') {
-    window.location.href = '/';
+    window.location.assign(withBasePath('/'));
   }
 };

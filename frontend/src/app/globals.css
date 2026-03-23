@@ -441,6 +441,131 @@ html[data-theme='dark'] .landing-check-line {
   color: #e6eefb;
 }
 
+.not-found-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.not-found-card {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 28%),
+    rgba(255, 255, 255, 0.84);
+  box-shadow: var(--shadow);
+  padding: 2.5rem;
+  backdrop-filter: blur(18px);
+}
+
+.not-found-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.not-found-code {
+  margin-top: 1.5rem;
+  color: #93c5fd;
+  font-size: clamp(4.5rem, 12vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.not-found-title {
+  margin-top: 0.9rem;
+  color: #0f172a;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.not-found-description {
+  margin-top: 1rem;
+  max-width: 42rem;
+  color: #51627d;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+}
+
+.not-found-primary-link,
+.not-found-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 0.95rem;
+  padding: 0.85rem 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.not-found-primary-link {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+.not-found-primary-link:hover {
+  filter: brightness(1.05);
+}
+
+.not-found-secondary-link {
+  border: 1px solid rgba(100, 116, 139, 0.35);
+  background: rgba(255, 255, 255, 0.72);
+  color: #1f2b3d;
+}
+
+.not-found-secondary-link:hover {
+  background: rgba(241, 245, 249, 0.96);
+}
+
+html[data-theme='dark'] .not-found-card {
+  border-color: rgba(96, 120, 156, 0.38);
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.16), transparent 28%),
+    rgba(15, 23, 42, 0.78);
+}
+
+html[data-theme='dark'] .not-found-badge {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+
+html[data-theme='dark'] .not-found-title {
+  color: #f8fbff;
+}
+
+html[data-theme='dark'] .not-found-description {
+  color: #b7c6df;
+}
+
+html[data-theme='dark'] .not-found-secondary-link {
+  border-color: rgba(121, 145, 181, 0.48);
+  background: rgba(30, 41, 59, 0.75);
+  color: #ecf5ff;
+}
+
+html[data-theme='dark'] .not-found-secondary-link:hover {
+  background: rgba(45, 58, 80, 0.95);
+}
+
 @media (max-width: 960px) {
   .landing-hero,
   .landing-role-grid,
@@ -461,7 +586,8 @@ html[data-theme='dark'] .landing-check-line {
 
   .landing-hero-copy,
   .landing-highlight-card,
-  .landing-panel {
+  .landing-panel,
+  .not-found-card {
     padding: 1.4rem;
   }
 
